@@ -1,0 +1,63 @@
+<% include ./partials/header %>
+
+<div class="container text-center">
+
+	<div class="well bandwell">
+
+	
+	    <h2> <%= book.title %> </h2>
+		
+		
+		<% if (book.author) { %>
+			<br /> <p> Author: <%= book.author %> </p>
+		<% } %>
+		<% if (book.category) { %>
+			<br /> <p> Category: <%= book.category %> </p>
+		<% } %>
+		<% if (book.publisher) { %>
+			<br /> <p> Publisher: <%= book.publisher %> </p>
+		<% } %>
+		<% if (book.published) { %>
+			<br /> <p> Published: <%= book.published %> </p>
+		<% } %>
+
+		<br />
+		<hr />
+
+		<a href='/books'>
+			<button class="btn btn-secondary">
+				All Books
+			</button>		
+		</a>
+		
+		<a href='/books/<%= book._id %>/edit'>
+			<button class="btn btn-warning">
+				Edit "<%= book.title %>" 
+			</button>		
+		</a>
+		
+		<% if (!deleteBook) { %>
+			<form id='delete'>
+				<button name="deletePushed" value="deleteBook" class="btn btn-danger">
+					Delete "<%= book.title %>" 
+				</button>
+			</form>			
+		<% } else { %>
+			<form id='delete' action='/books/<%= book._id %>?_method=DELETE' method='POST'>
+				<button  class="btn btn-danger">
+					Confirm Deletion of "<%= book.title %>" 
+				</button>
+			</form>		
+		<% } %>
+
+		
+	
+
+	</div> <!-- /well -->
+
+</div> <!-- /container -->
+
+
+<% include ./partials/footer %>
+
+	

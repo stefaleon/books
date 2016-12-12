@@ -1,0 +1,21 @@
+<% include partials/header %>
+
+<div class="container">
+
+	<div class="col-sm-4"></div>
+
+	<div class="col-sm-4">
+
+		<h3> Books </h3>
+
+		<% books.forEach((book) => { %>
+			<li> <%= book.author %> - <strong><a href="/books/<%= book._id %>"><%= book.title %></a></strong> </li>
+		<% }); %>		
+
+	</div>
+
+</div>
+
+
+<% include partials/footer %>
+
