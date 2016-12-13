@@ -45,10 +45,11 @@ app.post('/books', (req, res) => {
 		author: req.body.author,
 		category: req.body.category,
 		publisher: req.body.publisher
-	};
+	};	
 	Book.create(newBook, (err, newlyCreated) => {
 		if (err) { 			
-			console.log(err);
+			console.log(err.message);
+			res.status(400).send(err.message);
 		} else {
 			console.log('Book Created Succesfully!');
 			res.redirect('/books');
@@ -96,20 +97,24 @@ app.get('/books/:id', (req, res) => {
 app.put('/books/:id', (req, res) => {	
 	console.log(req.body);
 	var updatedBook = {
-		title: req.body.title,
+		title: req.body.title.trim(),
 		author: req.body.author,
 		category: req.body.category,
 		publisher: req.body.publisher
 	};
-	Book.findByIdAndUpdate(req.params.id, updatedBook, function(err, updatedBook) {
-		if (err) {		
-			console.log(err);	
-			res.redirect('/books');
-		} else {	
-			console.log('Update Successful!');		
-			res.redirect('/books/' + req.params.id);
-		}
-	});
+	if (req.body.title > 0 ){
+		Book.findByIdAndUpdate(req.params.id, updatedBook, function(err, updatedBook) {
+			if (err) {		
+				console.log(err);	
+				res.redirect('/books');
+			} else {	
+				console.log('Update Successful!');		
+				res.redirect('/books/' + req.params.id);
+			}
+		});
+	} else {
+		res.status(400).send("Book title cannot be empty.");
+	}	
 });
 
 
