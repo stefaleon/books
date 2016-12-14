@@ -101,8 +101,8 @@ app.put('/books/:id', (req, res) => {
 		author: req.body.author,
 		category: req.body.category,
 		publisher: req.body.publisher
-	};
-	if (req.body.title > 0 ){
+	};	
+	if (req.body.title.trim().length > 0 ){
 		Book.findByIdAndUpdate(req.params.id, updatedBook, function(err, updatedBook) {
 			if (err) {		
 				console.log(err);	
