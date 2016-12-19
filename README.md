@@ -5,3 +5,6 @@
 * body-parser
 * mongoose
 * method-override
+* passport
+* passport-local
+* passport-local-mongoose

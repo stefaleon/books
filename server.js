@@ -6,6 +6,12 @@ const mongoose= require('mongoose');
 const Book = require('./models/book');
 const dbURL = process.env.dbURL || 'mongodb://localhost/books';
 const methodOverride = require('method-override');
+const User = require('./models/user');
+const passport = require('passport');
+const LocalStrategy = require('passport-local');
+const passportLocalMongoose = require('passport-local-mongoose');
+
+
 
 mongoose.connect(dbURL);
 
@@ -13,6 +19,20 @@ app.set('view engine', 'ejs');
 app.use(express.static(__dirname + '/public'));
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(methodOverride('_method'));
+
+// auth setup
+app.use(require('express-session')({
+	secret: 'a book a day keeps the stupid away',
+	resave: false,
+	saveUninitialized: false
+}));
+app.use(passport.initialize());
+app.use(passport.session());
+passport.use(new LocalStrategy(User.authenticate()));
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
+
+
 
 
 // ROUTES
@@ -29,10 +49,10 @@ app.get('/newbook', (req, res) => {
 });
 
 // edit book form
-app.get('/books/:id/edit', (req, res) => {	
+app.get('/books/:id/edit', (req, res) => {
 	Book.findById(req.params.id,(err, foundBook) => {
-		res.render('edit', { book: foundBook });			
-	}); 	
+		res.render('edit', { book: foundBook });
+	});
 });
 
 // CREATE
@@ -45,9 +65,9 @@ app.post('/books', (req, res) => {
 		author: req.body.author,
 		category: req.body.category,
 		publisher: req.body.publisher
-	};	
+	};
 	Book.create(newBook, (err, newlyCreated) => {
-		if (err) { 			
+		if (err) {
 			console.log(err.message);
 			res.status(400).send(err.message);
 		} else {
@@ -64,73 +84,73 @@ app.post('/books', (req, res) => {
 // show all books
 app.get('/books', (req, res) => {
 	Book.find({}, (err, allBooks) => {
-		if (err) { 
+		if (err) {
 			console.log(err);
-		} else {	
+		} else {
 			//res.json(allBooks);
 			res.render('books', { books: allBooks });
 		}
-	});		
+	});
 });
 
 // show one book
 app.get('/books/:id', (req, res) => {
-	var deleteBook = false;		
+	var deleteBook = false;
 	Book.findById(req.params.id, (err, aBook) => {
-		if (err) {			
+		if (err) {
 			console.log(err);
 		} else {
 			if (req.query.deletePushed === 'deleteBook') {
-				deleteBook = true;	
+				deleteBook = true;
 			} else {
-				deleteBook = false;	
-			}			
+				deleteBook = false;
+			}
 			res.render('show', { book: aBook, deleteBook: deleteBook });
 		}
-	});	
+	});
 });
 
 
 // UPDATE
 //=============================================================
 // update a book
-app.put('/books/:id', (req, res) => {	
+app.put('/books/:id', (req, res) => {
 	console.log(req.body);
 	var updatedBook = {
 		title: req.body.title.trim(),
 		author: req.body.author,
 		category: req.body.category,
 		publisher: req.body.publisher
-	};	
+	};
 	if (req.body.title.trim().length > 0 ){
 		Book.findByIdAndUpdate(req.params.id, updatedBook, function(err, updatedBook) {
-			if (err) {		
-				console.log(err);	
+			if (err) {
+				console.log(err);
 				res.redirect('/books');
-			} else {	
-				console.log('Update Successful!');		
+			} else {
+				console.log('Update Successful!');
 				res.redirect('/books/' + req.params.id);
 			}
 		});
 	} else {
 		res.status(400).send("Book title cannot be empty.");
-	}	
+	}
 });
 
 
 // DESTROY
 //=============================================================
 // delete a book
-app.delete('/books/:id', (req, res) => {	
+app.delete('/books/:id', (req, res) => {
 	Book.findByIdAndRemove(req.params.id, function(err){
 		if (err) {
 			console.log(err);
 			res.redirect('/books/' + req.params.id);
-		} else {	
-			console.log('Remove Successful!');			
+		} else {
+			console.log('Remove Successful!');
 			res.redirect('/books');
 		}
-	}); 
+	});
 });
 
 
