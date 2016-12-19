@@ -44,12 +44,12 @@ app.get('/', (req, res) => {
 });
 
 // new book form
-app.get('/newbook', (req, res) => {
+app.get('/newbook', isLoggedIn, (req, res) => {
 	 res.render('new');
 });
 
 // edit book form
-app.get('/books/:id/edit', (req, res) => {
+app.get('/books/:id/edit', isLoggedIn, (req, res) => {
 	Book.findById(req.params.id,(err, foundBook) => {
 		res.render('edit', { book: foundBook });
 	});
@@ -58,7 +58,7 @@ app.get('/books/:id/edit', (req, res) => {
 // CREATE
 //=============================================================
 // create a book
-app.post('/books', (req, res) => {
+app.post('/books', isLoggedIn, (req, res) => {
 	console.log(req.body);
 	var newBook = {
 		title: req.body.title,
@@ -114,7 +114,7 @@ app.get('/books/:id', (req, res) => {
 // UPDATE
 //=============================================================
 // update a book
-app.put('/books/:id', (req, res) => {
+app.put('/books/:id', isLoggedIn, (req, res) => {
 	console.log(req.body);
 	var updatedBook = {
 		title: req.body.title.trim(),
@@ -141,7 +141,7 @@ app.put('/books/:id', (req, res) => {
 // DESTROY
 //=============================================================
 // delete a book
-app.delete('/books/:id', (req, res) => {
+app.delete('/books/:id', isLoggedIn, (req, res) => {
 	Book.findByIdAndRemove(req.params.id, function(err){
 		if (err) {
 			console.log(err);
@@ -191,8 +191,20 @@ app.post('/login', passport.authenticate('local', {
 }), (req, res) => {
 });
 
+// user logout
+app.get('/logout', (req, res) => {
+	req.logout();
+	res.redirect('/');
+});
 
 
+// authentication checking middleware
+function isLoggedIn(req, res, next) {
+	if (req.isAuthenticated()) {
+		return next();
+	}
+	res.redirect('/login');
+}
 
 
 

@@ -1,4 +1,4 @@
-## Basic Books App 0.0.2.4
+## Basic Books App 0.0.2.5
 
 * Express
 * EJS
@@ -140,4 +140,60 @@ Users are now authenticated via the *authenticate* method, which is included in 
 
 ```
 passport.use(new LocalStrategy(User.authenticate()));
+```
+
+## 0.0.2.5 commit
+
+* The logout route is added to *server.js*.
+
+```
+// user logout
+app.get('/logout', (req, res) => {
+	req.logout();
+	res.redirect('/');
+});
+```
+
+Users are logged out by requesting the *logout* method, available through *passport*.
+
+* The function *isLoggedIn* is using the *passport* method *isAuthenticated* to check if a request is indeed authenticated.
+
+```
+function isLoggedIn(req, res, next) {
+	if (req.isAuthenticated()) {
+		return next();
+	}
+	res.redirect('/login');
+}
+```
+
+* It is consequently used as middleware in the *CREATE*, *UPDATE* and *DESTROY* routes.
+
+```
+app.post('/books', isLoggedIn, (req, res) => {
+    ...
+    ...
+
+app.put('/books/:id', isLoggedIn, (req, res) => {
+    ...
+    ...
+
+app.delete('/books/:id', isLoggedIn, (req, res) => {
+    ...
+    ...    
+
+```
+
+It is also used as middleware in the form showing routes.
+
+```
+// new book form
+app.get('/newbook', isLoggedIn, (req, res) => {
+	 res.render('new');
+});
+
+// edit book form
+app.get('/books/:id/edit', isLoggedIn, (req, res) => {
+    ...
+    ...
 ```
