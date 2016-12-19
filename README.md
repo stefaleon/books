@@ -1,4 +1,4 @@
-## Basic Books App 0.0.2.2
+## Basic Books App 0.0.2.3
 
 * Express
 * EJS
@@ -27,8 +27,7 @@ const UserSchema = new mongoose.Schema({
 		trim: true
 	},
     password:  {
-		type: String,
-		required: true,
+		type: String,		
 		minlength: 4,
 		trim: true
 	}
@@ -94,6 +93,27 @@ app.post('/signup', (req, res) => {
 	res.json({
 		username: req.body.username,
 		password: req.body.password
+	});
+});
+```
+## 0.0.2.3 commit
+
+* The *register* method, which is included in the *passport-local-mongoose* dependency, is used to store the username and a hashed version of the submitted password in the database.
+
+```
+// CREATE a user
+app.post('/signup', (req, res) => {
+	var newUser = new User({username: req.body.username});
+	// register method hashes the password
+	User.register(newUser, req.body.password, (err, user) => {
+		if (err) {
+			console.log(err);
+			return res.render('register');
+		}
+		// if no error occurs, local strategy authentication takes place
+		passport.authenticate('local')(req, res, () => {
+			res.redirect('/');
+		});
 	});
 });
 ```

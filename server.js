@@ -22,7 +22,7 @@ app.use(methodOverride('_method'));
 
 // auth setup
 app.use(require('express-session')({
-	secret: 'a book a day keeps the stupid away',
+	secret: 'a book a day keeps the boredom away',
 	resave: false,
 	saveUninitialized: false
 }));
@@ -165,9 +165,17 @@ app.get('/signup', (req, res) => {
 
 // CREATE a user
 app.post('/signup', (req, res) => {
-	res.json({
-		username: req.body.username,
-		password: req.body.password
+	var newUser = new User({username: req.body.username});
+	// register method hashes the password
+	User.register(newUser, req.body.password, (err, user) => {
+		if (err) {
+			console.log(err);
+			return res.render('register');
+		}
+		// if no error occurs, local strategy authentication takes place
+		passport.authenticate('local')(req, res, () => {
+			res.redirect('/');
+		});
 	});
 });
 
