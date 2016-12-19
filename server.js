@@ -155,7 +155,29 @@ app.delete('/books/:id', (req, res) => {
 
 
 
+// auth routes
+//=============================================================
 
+// new user form
+app.get('/signup', (req, res) => {
+	res.render('register');
+});
+
+// CREATE a user
+app.post('/signup', (req, res) => {
+	res.json({
+		username: req.body.username,
+		password: req.body.password
+	});
+});
+
+
+
+
+
+
+
+// app listen
 app.listen(PORT, process.env.IP, () => {
     console.log('Server started on port', PORT);
 });
