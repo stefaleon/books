@@ -179,6 +179,17 @@ app.post('/signup', (req, res) => {
 	});
 });
 
+// login form
+app.get('/login', (req, res) => {
+	res.render('login');
+});
+
+// user login
+app.post('/login', passport.authenticate('local', {
+	successRedirect: '/',
+	failureRedirect: '/login'
+}), (req, res) => {
+});
 
 
 

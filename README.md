@@ -1,4 +1,4 @@
-## Basic Books App 0.0.2.3
+## Basic Books App 0.0.2.4
 
 * Express
 * EJS
@@ -116,4 +116,28 @@ app.post('/signup', (req, res) => {
 		});
 	});
 });
+```
+
+## 0.0.2.4 commit
+
+* The login routes are added to *server.js*.
+
+```
+// login form
+app.get('/login', (req, res) => {
+	res.render('login');
+});
+
+// user login
+app.post('/login', passport.authenticate('local', {
+	successRedirect: '/',
+	failureRedirect: '/login'
+}), (req, res) => {
+});
+```
+
+Users are now authenticated via the *authenticate* method, which is included in the *passport-local-mongoose* dependency.
+
+```
+passport.use(new LocalStrategy(User.authenticate()));
 ```
