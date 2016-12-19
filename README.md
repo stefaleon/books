@@ -1,4 +1,4 @@
-## Basic Books App 0.0.2.5
+## Basic Books App 0.0.2.6
 
 * Express
 * EJS
@@ -197,3 +197,51 @@ app.get('/books/:id/edit', isLoggedIn, (req, res) => {
     ...
     ...
 ```
+
+## 0.0.2.6 commit
+
+*  *Passport*'s *req.user*, which is undefined if there is not a logged in user or an object containing the current user's id and username, is passed as *currentUser* to all locals, in order to be used in logic controlling the view, according to whether a user is logged in or not.  
+
+```
+// middleware for passing current user to all routes
+app.use((req, res, next) => {
+	res.locals.currentUser = req.user;
+	next();
+});
+```
+
+* Then the navigation bar is modified accordingly in *views/partials/header.ejs*, so that the *Log In* and *Sign Up* tabs are displayed when there is not a logged-in user, while the logged-in user name and the *Log Out* tab are displayed otherwise.
+
+```
+<ul class="nav navbar-nav navbar-right">
+    <% if (!currentUser) { %>
+       <li><a href="/login">Login</a></li>
+       <li><a href="/register">Sign Up</a></li>
+    <% } else { %>
+       <li><a href="#"><strong><%= currentUser.username %></strong></a></li>
+       <li><a href="/logout">Logout</a></li>
+    <% } %>
+</ul>
+```
+* Also when a book entry is displayed via *views/show.ejs*, the *Edit* and *Delete* buttons are displayed only when there is a logged-in user.
+
+```
+<% if (currentUser) { %>
+
+    <a href='/books/<%= book._id %>/edit'>
+        ...
+        (edit and delete buttons)
+        ...
+        ...
+
+<% } %>
+```
+
+
+
+
+
+## TODO
+* associate books to users
+* add *my books* tab
+* users should only edit/delete the books they added and not other users' additions.

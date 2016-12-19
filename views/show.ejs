@@ -4,10 +4,10 @@
 
 	<div class="well bandwell">
 
-	
+
 	    <h2> <%= book.title %> </h2>
-		
-		
+
+
 		<% if (book.author) { %>
 			<br /> <p> Author: <%= book.author %> </p>
 		<% } %>
@@ -27,31 +27,33 @@
 		<a href='/books'>
 			<button class="btn btn-secondary">
 				All Books
-			</button>		
+			</button>
 		</a>
-		
-		<a href='/books/<%= book._id %>/edit'>
-			<button class="btn btn-warning">
-				Edit "<%= book.title %>" 
-			</button>		
-		</a>
-		
-		<% if (!deleteBook) { %>
-			<form id='delete'>
-				<button name="deletePushed" value="deleteBook" class="btn btn-danger">
-					Delete "<%= book.title %>" 
+
+		<% if (currentUser) { %>
+
+			<a href='/books/<%= book._id %>/edit'>
+				<button class="btn btn-warning">
+					Edit "<%= book.title %>"
 				</button>
-			</form>			
-		<% } else { %>
-			<form id='delete' action='/books/<%= book._id %>?_method=DELETE' method='POST'>
-				<button  class="btn btn-danger">
-					Confirm Deletion of "<%= book.title %>" 
-				</button>
-			</form>		
+			</a>
+
+			<% if (!deleteBook) { %>
+				<form id='delete'>
+					<button name="deletePushed" value="deleteBook" class="btn btn-danger">
+						Delete "<%= book.title %>"
+					</button>
+				</form>
+			<% } else { %>
+				<form id='delete' action='/books/<%= book._id %>?_method=DELETE' method='POST'>
+					<button  class="btn btn-danger">
+						Confirm Deletion of "<%= book.title %>"
+					</button>
+				</form>
+			<% } %>
+
 		<% } %>
 
-		
-	
 
 	</div> <!-- /well -->
 
@@ -59,5 +61,3 @@
 
 
 <% include ./partials/footer %>
-
-	

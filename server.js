@@ -33,14 +33,20 @@ passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
 
-
+// passport provides req.user, below it is passed to the templates in order to be used for ejs logic
+// middleware for passing current user to all routes
+app.use((req, res, next) => {
+	res.locals.currentUser = req.user;
+	next();
+});
 
 // ROUTES
 //=============================================================
 
 // main route
 app.get('/', (req, res) => {
-	 res.redirect('books');
+	console.log(req.user);
+	res.redirect('books');
 });
 
 // new book form
