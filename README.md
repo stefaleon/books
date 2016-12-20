@@ -1,4 +1,4 @@
-## Basic Books App 0.0.2.7
+## Basic Books App 0.0.2.8
 
 * Express
 * EJS
@@ -11,7 +11,8 @@
 * passport-local-mongoose
 
 
-## 0.0.2.1 commit
+## 0.0.2.1
+### Add a *User* model and configure authentication
 
 * User model is added in *models/user.js*, along with the methods available in *passport-local-mongoose*.
 
@@ -55,13 +56,14 @@ passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 ```
 
-* Username-Password authentication wll be used to start with.
+* Username-Password authentication will be used to start with.
 ```
 const LocalStrategy = require('passport-local');
 ```
 
 
-## 0.0.2.2 commit
+## 0.0.2.2
+### Add the *Sign Up* view and routes.
 
 * A sign-up view is configured in *views/register.ejs*.
 ```
@@ -96,7 +98,8 @@ app.post('/signup', (req, res) => {
 	});
 });
 ```
-## 0.0.2.3 commit
+## 0.0.2.3
+### Configure the *CREATE* user route
 
 * The *register* method, which is included in the *passport-local-mongoose* dependency, is used to store the username and a hashed version of the submitted password in the database.
 
@@ -118,7 +121,8 @@ app.post('/signup', (req, res) => {
 });
 ```
 
-## 0.0.2.4 commit
+## 0.0.2.4
+### Add the *Log In* routes.
 
 * The login routes are added to *server.js*.
 
@@ -142,7 +146,8 @@ Users are now authenticated via the *authenticate* method, which is included in 
 passport.use(new LocalStrategy(User.authenticate()));
 ```
 
-## 0.0.2.5 commit
+## 0.0.2.5
+### Add the *Log Out* route and the *User Is Logged In* middleware
 
 * The logout route is added to *server.js*.
 
@@ -198,7 +203,8 @@ app.get('/books/:id/edit', isLoggedIn, (req, res) => {
     ...
 ```
 
-## 0.0.2.6 commit
+## 0.0.2.6
+### Adjust views to *Current User*
 
 *  *Passport*'s *req.user*, which is undefined if there is not a logged in user or an object containing the current user's id and username, is passed as *currentUser* to all locals, in order to be used in logic controlling the view, according to whether a user is logged in or not.  
 
@@ -237,7 +243,9 @@ app.use((req, res, next) => {
 <% } %>
 ```
 
-## 0.0.2.7 commit
+## 0.0.2.7
+### Associate books to users
+
 * In order to associate each presented book to the user who made the addition, the book schema is updated in *models/book.js* so that it contains a *user* property that contains the username and a reference to the *User* model id.
 
 
@@ -285,7 +293,65 @@ app.post('/books', isLoggedIn, (req, res) => {
     <% } %>
 ```
 
+## 0.0.2.8
+### Make *edit* and *delete* functionality available only for authorized users
+
+* In order to provide the functionality that users should only edit/delete the books they added and not other users' additions, authorization checking middleware is required. The *checkAuthorization* function checks whether a user is logged in or not, just as *isLoggedIn* does, but on top of that it introduces the relevant authorization logic.
+
+```
+// authorization checking middleware
+// applicable for editing or deleting books created by the logged-in user
+function checkAuthorization(req, res, next) {
+	// if user is authenticated (logged-in)
+	if (req.isAuthenticated()) {
+		// find the book to check for authorization as well
+		Book.findById(req.params.id, (err, foundBook) => {
+			if (err) {
+				res.redirect('back');
+			} else {
+				// if current user is the one who added the book
+				if (foundBook.user.id && foundBook.user.id.equals(req.user._id)) {
+					next();
+				} else {
+					res.redirect('back');
+				}
+			}
+		});
+	} else {
+		res.redirect('back');
+	}
+}
+```
+
+* The *checkAuthorization* middleware method replaces the *isLoggedIn* method in the *UPDATE* and *DESTROY* routes and in the edit form showing route.
+
+```
+app.put('/books/:id', checkAuthorization, (req, res) => {
+    ...
+    ...
+
+app.delete('/books/:id', checkAuthorization, (req, res) => {
+    ...
+    ...
+
+app.get('/books/:id/edit', checkAuthorization, (req, res) => {
+    ...
+    ...
+```
+
+* For the UX improvement, in *views/show.ejs*, the *Edit* and *Delete* buttons are displayed only for authorized users.
+
+```
+<% if (currentUser && book.user.id && book.user.id.equals(currentUser._id)) { %>
+
+    <a href='/books/<%= book._id %>/edit'>
+            ...
+            (edit and delete buttons)
+            ...
+            ...
+
+<% } %>            
+```
 
 ## TODO
 * add *my books* tab
-* users should only edit/delete the books they added and not other users' additions.

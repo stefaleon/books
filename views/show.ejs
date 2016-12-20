@@ -34,7 +34,7 @@
 			</button>
 		</a>
 
-		<% if (currentUser) { %>
+		<% if (currentUser && book.user.id && book.user.id.equals(currentUser._id)) { %>
 
 			<a href='/books/<%= book._id %>/edit'>
 				<button class="btn btn-warning">

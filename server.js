@@ -55,7 +55,7 @@ app.get('/newbook', isLoggedIn, (req, res) => {
 });
 
 // edit book form
-app.get('/books/:id/edit', isLoggedIn, (req, res) => {
+app.get('/books/:id/edit', checkAuthorization, (req, res) => {
 	Book.findById(req.params.id,(err, foundBook) => {
 		res.render('edit', { book: foundBook });
 	});
@@ -125,7 +125,7 @@ app.get('/books/:id', (req, res) => {
 // UPDATE
 //=============================================================
 // update a book
-app.put('/books/:id', isLoggedIn, (req, res) => {
+app.put('/books/:id', checkAuthorization, (req, res) => {
 	console.log(req.body);
 	var updatedBook = {
 		title: req.body.title.trim(),
@@ -152,7 +152,7 @@ app.put('/books/:id', isLoggedIn, (req, res) => {
 // DESTROY
 //=============================================================
 // delete a book
-app.delete('/books/:id', isLoggedIn, (req, res) => {
+app.delete('/books/:id', checkAuthorization, (req, res) => {
 	Book.findByIdAndRemove(req.params.id, function(err){
 		if (err) {
 			console.log(err);
@@ -215,6 +215,30 @@ function isLoggedIn(req, res, next) {
 		return next();
 	}
 	res.redirect('/login');
+}
+
+
+// authorization checking middleware
+// applicable for editing or deleting books created by the logged-in user
+function checkAuthorization(req, res, next) {
+	// if user is authenticated (logged-in)
+	if (req.isAuthenticated()) {
+		// find the book to check for authorization as well
+		Book.findById(req.params.id, (err, foundBook) => {
+			if (err) {
+				res.redirect('back');
+			} else {
+				// if current user is the one who added the book
+				if (foundBook.user.id && foundBook.user.id.equals(req.user._id)) {
+					next();
+				} else {
+					res.redirect('back');
+				}
+			}
+		});
+	} else {
+		res.redirect('back');
+	}
 }
 
 
