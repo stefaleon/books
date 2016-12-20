@@ -1,4 +1,4 @@
-## Basic Books App 0.0.2.6
+## Basic Books App 0.0.2.7
 
 * Express
 * EJS
@@ -237,11 +237,55 @@ app.use((req, res, next) => {
 <% } %>
 ```
 
+## 0.0.2.7 commit
+* In order to associate each presented book to the user who made the addition, the book schema is updated in *models/book.js* so that it contains a *user* property that contains the username and a reference to the *User* model id.
 
 
+```
+const bookSchema = new mongoose.Schema({
+	user: {
+		id: {
+			type: mongoose.Schema.Types.ObjectId,
+			ref: 'User'
+		},
+		username: String
+	},
+	title: {
+            ...
+            ...
+```
+
+* In the *CREATE* route, the *user* properties (*_id* and *username*) are added to the *newBook* data.
+
+```
+app.post('/books', isLoggedIn, (req, res) => {
+	console.log('req.body', req.body);
+	console.log('req.user', req.user);
+	var newBook = {
+		user: {
+			id: req.user._id,
+			username: req.user.username
+		},
+		title: req.body.title,
+		author: req.body.author,
+		category: req.body.category,
+		publisher: req.body.publisher
+	};
+	Book.create(newBook, (err, newlyCreated) => {
+        ...
+        ...
+```
+
+* Eventually, in *views/show.ejs*, the user who made the addition is shown.
+
+```
+    ...
+    <% if (book.user.username) { %>
+        <br /> <p> Added by: <%= book.user.username %> </p>
+    <% } %>
+```
 
 
 ## TODO
-* associate books to users
 * add *my books* tab
 * users should only edit/delete the books they added and not other users' additions.

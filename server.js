@@ -65,8 +65,13 @@ app.get('/books/:id/edit', isLoggedIn, (req, res) => {
 //=============================================================
 // create a book
 app.post('/books', isLoggedIn, (req, res) => {
-	console.log(req.body);
+	console.log('req.body', req.body);
+	console.log('req.user', req.user);
 	var newBook = {
+		user: {
+			id: req.user._id,
+			username: req.user.username
+		},
 		title: req.body.title,
 		author: req.body.author,
 		category: req.body.category,

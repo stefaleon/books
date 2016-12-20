@@ -20,6 +20,10 @@
 		<% if (book.published) { %>
 			<br /> <p> Published: <%= book.published %> </p>
 		<% } %>
+		<% if (book.user.username) { %>
+			<br /> <p> Added by: <%= book.user.username %> </p>
+		<% } %>
+
 
 		<br />
 		<hr />
